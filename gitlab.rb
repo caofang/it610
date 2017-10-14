@@ -10,7 +10,10 @@
 ##! URL on which GitLab will be reachable.
 ##! For more details on configuring external_url see:
 ##! https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
-external_url 'http://gitlab.diy1024.com'
+
+external_url 'http://gitlab.diy1024.com:8080'
+unicorn['port'] = 8081
+
 
 ## Legend
 ##! The following notations at the beginning of each line may be used to
