@@ -28,9 +28,6 @@
 ### gitlab repository backup to /var/opt/gitlab/backups/
 0 0 * * * sudo gitlab-rake gitlab:backup:create
 
-### gitlab config backup to /home/it610/Desktop/it610/proj1/gitlab/backup
-1 0 * * * sudo tar cvfj /home/it610/Desktop/it610/proj1/gitlab/backup/$(date "+etc_gitlab_%s.tar.bz2") /etc/gitlab/
-
 
 
 

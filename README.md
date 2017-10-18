@@ -8,7 +8,7 @@ sudo apt-get install -y postfix
 curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
 sudo apt-get install gitlab-ce
 sudo gitlab-ctl reconfigure
-sudo gitlab-ctl restart
+
 
 ### config gitlab
 
@@ -118,6 +118,6 @@ sudo update-rc.d nagios defaults
 
 
 
-### configure remote host
+<!-- ### configure remote host
 apt-get install nagios-plugins nagios-nrpe-server
-/etc/nagios/nrpe.cfg
+/etc/nagios/nrpe.cfg -->
