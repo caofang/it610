@@ -10,6 +10,16 @@ curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/scrip
 sudo apt-get install gitlab-ce
 sudo gitlab-ctl reconfigure
 
+### https 
+sudo mkdir -p /etc/gitlab/ssl
+sudo chmod 700 /etc/gitlab/ssl
+
+# copy the ssl certificate and key to /etc.gitlab/ssl/
+
+nginx['ssl_certificate'] = "/etc/gitlab/ssl/diy1024_com.crt"
+nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/diy1024.key"
+
+
 
 ### config gitlab
 

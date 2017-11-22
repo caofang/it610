@@ -11,9 +11,21 @@
 ##! For more details on configuring external_url see:
 ##! https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
 
-external_url 'http://gitlab.diy1024.com:8080'
-unicorn['port'] = 8081
+external_url 'https://diy1024.com'
+nginx['redirect_http_to_https'] = true
 
+nginx['ssl_certificate'] = "/etc/gitlab/ssl/diy1024_com.crt"
+nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/diy1024.key"
+
+
+## Roles for multi-instance GitLab
+##! The default is to have no roles enabled, which results in GitLab running as an all-in-one instance.
+##! Options:
+##!   redis_sentinel_role redis_master_role redis_slave_role geo_primary_role geo_secondary_role
+##! For more deatils on each role, see:
+##! https://docs.gitlab.com/omnibus/roles/README.html#roles
+##!
+# roles ['redis_sentinel_role', 'redis_master_role']
 
 ## Legend
 ##! The following notations at the beginning of each line may be used to
@@ -67,7 +79,7 @@ unicorn['port'] = 8081
 ### Automatic issue closing
 ###! See https://docs.gitlab.com/ce/customization/issue_closing.html for more
 ###! information about this pattern.
-# gitlab_rails['gitlab_issue_closing_pattern'] = "((?:[Cc]los(?:e[sd]?|ing)|[Ff]ix(?:e[sd]|ing)?|[Rr]esolv(?:e[sd]?|ing))(:?) +(?:(?:issues? +)?%{issue_ref}(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\d+))+)"
+# gitlab_rails['gitlab_issue_closing_pattern'] = "((?:[Cc]los(?:e[sd]?|ing)|[Ff]ix(?:e[sd]|ing)?|[Rr]esolv(?:e[sd]?|ing)|[Ii]mplement(?:s|ed|ing)?)(:?) +(?:(?:issues? +)?%{issue_ref}(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\d+))+)"
 
 ### Download location
 ###! When a user clicks e.g. 'Download zip' on a project, a temporary zip file
@@ -201,19 +213,11 @@ unicorn['port'] = 8081
 #     password: '_the_password_of_the_bind_user'
 #     encryption: 'plain' # "start_tls" or "simple_tls" or "plain"
 #     verify_certificates: true
-#     ca_file: ''
-#     ssl_version: ''
 #     active_directory: true
 #     allow_username_or_email_login: false
 #     block_auto_created_users: false
 #     base: ''
 #     user_filter: ''
-#     attributes:
-#       username: ['uid', 'userid', 'sAMAccountName']
-#       email:    ['mail', 'email', 'userPrincipalName']
-#       name:       'cn'
-#       first_name: 'givenName'
-#       last_name:  'sn'
 #     ## EE only
 #     group_base: ''
 #     admin_group: ''
@@ -228,19 +232,11 @@ unicorn['port'] = 8081
 #     password: '_the_password_of_the_bind_user'
 #     encryption: 'plain' # "start_tls" or "simple_tls" or "plain"
 #     verify_certificates: true
-#     ca_file: ''
-#     ssl_version: ''
 #     active_directory: true
 #     allow_username_or_email_login: false
 #     block_auto_created_users: false
 #     base: ''
 #     user_filter: ''
-#     attributes:
-#       username: ['uid', 'userid', 'sAMAccountName']
-#       email:    ['mail', 'email', 'userPrincipalName']
-#       name:       'cn'
-#       first_name: 'givenName'
-#       last_name:  'sn'
 #     ## EE only
 #     group_base: ''
 #     admin_group: ''
@@ -306,11 +302,7 @@ unicorn['port'] = 8081
 ###!   path that doesn't contain symlinks.**
 # git_data_dirs({
 #   "default" => {
-#     "path" => "/mnt/nfs-01/git-data",
-#     "failure_count_threshold" => 10,
-#     "failure_wait_time" => 30,
-#     "failure_reset_time" => 1800,
-#     "storage_timeout" => 30
+#     "path" => "/mnt/nfs-01/git-data"
 #    }
 # })
 
@@ -321,10 +313,12 @@ unicorn['port'] = 8081
 ###! Docs: https://docs.gitlab.com/ce/development/shared_files.html
 # gitlab_rails['shared_path'] = '/var/opt/gitlab/gitlab-rails/shared'
 
+### Wait for file system to be mounted
+###! Docs: https://docs.gitlab.com/omnibus/settings/configuration.html#only-start-omnibus-gitlab-services-after-a-given-filesystem-is-mounted
+# high_availability['mountpoint'] = ["/var/opt/gitlab/git-data", "/var/opt/gitlab/gitlab-rails/shared"]
+
 ### GitLab Shell settings for GitLab
 # gitlab_rails['gitlab_shell_ssh_port'] = 22
-# gitlab_rails['git_max_size'] = 20971520
-# gitlab_rails['git_timeout'] = 10
 # gitlab_rails['gitlab_shell_git_timeout'] = 800
 
 ### Extra customization
@@ -394,7 +388,7 @@ unicorn['port'] = 8081
 # gitlab_rails['db_socket'] = nil
 # gitlab_rails['db_sslmode'] = nil
 # gitlab_rails['db_sslrootcert'] = nil
-# gitlab_rails['db_prepared_statements'] = true
+# gitlab_rails['db_prepared_statements'] = false
 # gitlab_rails['db_statements_limit'] = 1000
 
 
@@ -420,6 +414,12 @@ unicorn['port'] = 8081
 # gitlab_rails['redis_sentinels'] = [
 #   {'host' => '127.0.0.1', 'port' => 26379},
 # ]
+
+#### Separate instances support
+###! Docs: https://docs.gitlab.com/omnibus/settings/redis.html#running-with-multiple-redis-instances
+# gitlab_rails['redis_cache_instance'] = nil
+# gitlab_rails['redis_queues_instance'] = nil
+# gitlab_rails['redis_shared_state_instance'] = nil
 
 ### GitLab email server settings
 ###! Docs: https://docs.gitlab.com/omnibus/settings/smtp.html
@@ -668,6 +668,15 @@ unicorn['port'] = 8081
 # postgresql['dynamic_shared_memory_type'] = nil
 # postgresql['hot_standby'] = "off"
 
+### SSL settings
+# See https://www.postgresql.org/docs/9.6/static/runtime-config-connection.html#GUC-SSL-CERT-FILE for more details
+# postgresql['ssl'] = 'off'
+# postgresql['ssl_ciphers'] = 'HIGH:MEDIUM:+3DES:!aNULL:!SSLv3:!TLSv1'
+# postgresql['ssl_cert_file'] = 'server.crt'
+# postgresql['ssl_key_file'] = 'server.key'
+# postgresql['ssl_ca_file'] = '/opt/gitlab/embedded/ssl/certs/cacert.pem'
+# postgresql['ssl_crl_file'] = nil
+
 ### Replication settings
 ###! Note, some replication settings do not require a full restart. They are documented below.
 # postgresql['wal_level'] = "hot_standby"
@@ -685,6 +694,7 @@ unicorn['port'] = 8081
 # postgresql['checkpoint_segments'] = 10
 # postgresql['checkpoint_timeout'] = "5min"
 # postgresql['checkpoint_completion_target'] = 0.9
+# postgresql['effective_io_concurrency'] = 1
 # postgresql['checkpoint_warning'] = "30s"
 # postgresql['effective_cache_size'] = "1MB"
 # postgresql['shmmax'] =  17179869184 # or 4294967295
@@ -701,6 +711,11 @@ unicorn['port'] = 8081
 # postgresql['statement_timeout'] = "60000"
 # postgresql['idle_in_transaction_session_timeout'] = "60000"
 # postgresql['log_line_prefix'] = "%a"
+# postgresql['max_worker_processes'] = 8
+# postgreslq['max_parallel_workers_per_gather'] = 0
+# postgresql['log_lock_waits'] = 1
+# postgresql['deadlock_timeout'] = '5s'
+# postgresql['track_io_timing'] = 0
 
 ### Available in PostgreSQL 9.6 and later
 # postgresql['min_wal_size'] = 80MB
@@ -1022,6 +1037,10 @@ unicorn['port'] = 8081
 # gitlab_pages['dir'] = "/var/opt/gitlab/gitlab-pages"
 # gitlab_pages['log_directory'] = "/var/log/gitlab/gitlab-pages"
 
+# gitlab_pages['artifacts_server'] = true
+# gitlab_pages['artifacts_server_url'] = nil # Defaults to external_url + '/api/v4'
+# gitlab_pages['artifacts_server_timeout'] = 10
+
 ##! Prometheus metrics for Pages docs: https://gitlab.com/gitlab-org/gitlab-pages/#enable-prometheus-metrics
 # gitlab_pages['metrics_address'] = ":9235"
 
@@ -1196,10 +1215,11 @@ unicorn['port'] = 8081
 # mattermost['ratelimit_vary_by_header'] = nil
 # mattermost['ratelimit_max_burst'] = 100
 
-# mattermost['support_terms_of_service_link'] = "/static/help/terms.html"
-# mattermost['support_privacy_policy_link'] = "/static/help/privacy.html"
-# mattermost['support_about_link'] = "/static/help/about.html"
-# mattermost['support_report_a_problem_link'] =  "/static/help/report_problem.html"
+# mattermost['support_terms_of_service_link'] = "https://about.mattermost.com/default-terms/"
+# mattermost['support_privacy_policy_link'] = "https://about.mattermost.com/default-privacy-policy/"
+# mattermost['support_about_link'] = "https://about.mattermost.com/default-about/"
+# mattermost['support_help_link'] = "https://about.mattermost.com/default-help/"
+# mattermost['support_report_a_problem_link'] = "https://about.mattermost.com/default-report-a-problem/"
 # mattermost['support_email'] =  "support@example.com"
 
 # mattermost['privacy_show_email_address'] = true
@@ -1397,7 +1417,25 @@ unicorn['port'] = 8081
 # gitaly['prometheus_grpc_latency_buckets'] = "[0.001, 0.005, 0.025, 0.1, 0.5, 1.0, 10.0, 30.0, 60.0, 300.0, 1500.0]"
 # gitaly['auth_token'] = '<secret>'
 # gitaly['auth_transitioning'] = false # When true, auth is logged to Prometheus but NOT enforced
-
+# gitaly['storage'] = [
+#   {
+#     'name' => 'default',
+#     'path' => '/tmp/path-1'
+#   },
+#   {
+#     'name' => 'nfs1',
+#     'path' => '/mnt/nfs1'
+#   }
+# ]
+# gitaly['concurrency'] = [
+#   {
+#     'rpc' => "/gitaly.SmartHTTPService/PostReceivePack",
+#     'max_per_repo' => 20
+#   }, {
+#     'rpc' => "/gitaly.SSHService/SSHUploadPack",
+#     'max_per_repo' => 5
+#   }
+# ]
 
 ################################################################################
 ################################################################################
@@ -1567,16 +1605,17 @@ unicorn['port'] = 8081
 # pgbouncer['data_directory'] = '/var/opt/gitlab/pgbouncer'
 # pgbouncer['listen_addr'] = '0.0.0.0'
 # pgbouncer['listen_port'] = '6432'
-# pgbouncer['pool_mode'] = 'session'
+# pgbouncer['pool_mode'] = 'transaction'
 # pgbouncer['server_reset_query'] = 'DISCARD ALL'
-# pgbouncer['max_client_conn'] = '100'
-# pgbouncer['default_pool_size'] = '20'
+# pgbouncer['application_name_add_host'] = '1'
+# pgbouncer['max_client_conn'] = '2048'
+# pgbouncer['default_pool_size'] = '100'
 # pgbouncer['min_pool_size'] = '0'
-# pgbouncer['reserve_pool_size'] = '0'
+# pgbouncer['reserve_pool_size'] = '5'
 # pgbouncer['reserve_pool_timeout'] = '5.0'
 # pgbouncer['server_round_robin'] = '0'
 # pgbouncer['log_connections'] = '0'
-# pgbouncer['server_idle_timeout'] = '600.0'
+# pgbouncer['server_idle_timeout'] = '30'
 # pgbouncer['dns_max_ttl'] = '15.0'
 # pgbouncer['dns_zone_check_period'] = '0'
 # pgbouncer['dns_nxdomain_ttl'] = '15.0'
@@ -1662,6 +1701,7 @@ unicorn['port'] = 8081
 # consul['config_dir'] = '/var/opt/gitlab/consul/config.d'
 # consul['data_dir'] = '/var/opt/gitlab/consul/data'
 # consul['log_directory'] = '/var/log/gitlab/consul'
+# consul['node_name'] = nil
 # consul['script_directory'] = '/var/opt/gitlab/consul/scripts'
 # consul['configuration'] = {
 #   'client_addr' => nil,
