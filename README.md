@@ -70,13 +70,13 @@ cp -R contrib/eventhandlers/ /usr/local/nagios/libexec/
 chown -R nagios:nagios /usr/local/nagios/libexec/eventhandlers
 /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
-sudo service restart apache2 
+sudo service apache2 restart
 sudo a2ensite nagios
 sudo a2enmod rewrite cgi
 
 
 sudo cp /etc/init.d/skeleton /etc/init.d/nagios
-sudo vi /etc/init.d/nagios (and add the following lines)
+sudo nano /etc/init.d/nagios (and add the following lines)
 
 DESC="Nagios"
 NAME=nagios
@@ -119,7 +119,9 @@ cd nagios-plugin-2.1.2/
 make
 make install
 
-uncomment line 51 for the host monitor configuration.
+## uncomment line 51 for the host monitor configuration.
+sudo nano -c /usr/local/nagios/etc/nagios.cfg
+
 cfg_dir=/usr/local/nagios/etc/servers
 
 ##Nagios Service Setup
