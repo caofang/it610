@@ -68,7 +68,9 @@ make install-webconf
 
 cp -R contrib/eventhandlers/ /usr/local/nagios/libexec/
 chown -R nagios:nagios /usr/local/nagios/libexec/eventhandlers
+
 /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+sudo service nagios restart
 
 sudo service apache2 restart
 sudo a2ensite nagios
@@ -127,10 +129,13 @@ cfg_dir=/usr/local/nagios/etc/servers
 ##Nagios Service Setup
 sudo update-rc.d nagios defaults
 
+## install NRPE Service
+sudo apt-get install nagios-nrpe-server nagios-plugins
 
 
 
 
-<!-- ### configure remote host
+
+### configure remote host
 apt-get install nagios-plugins nagios-nrpe-server
-/etc/nagios/nrpe.cfg -->
+/etc/nagios/nrpe.cfg

@@ -1,0 +1,7 @@
+/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+sudo service nagios restart
+sudo service apache2 restart
+
+./check_by_ssh -H diy1024.com -i "/home/ubuntu/.ssh/it610.pem" -l "ubuntu" -C "/tmp/test" -E 
+
+ssh -i /home/ubuntu/.ssh/it610.pem ubuntu@diy1024.com
