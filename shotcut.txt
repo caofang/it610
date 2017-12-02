@@ -4,4 +4,8 @@ sudo service apache2 restart
 
 ./check_by_ssh -H diy1024.com -i "/home/ubuntu/.ssh/it610.pem" -l "ubuntu" -C "/tmp/test" -E 
 
-ssh -i /home/ubuntu/.ssh/it610.pem ubuntu@diy1024.com
+ssh -i /home/ubuntu/.ssh/it610.pem ubuntu@diy1024.
+
+
+sudo /etc/init.d/nagios-nrpe-server restart
+netstat -l -n  | grep 5666

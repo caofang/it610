@@ -136,6 +136,34 @@ sudo apt-get install nagios-nrpe-server nagios-plugins
 
 
 
-### configure remote host
+<!-- ### configure remote host
 apt-get install nagios-plugins nagios-nrpe-server
-/etc/nagios/nrpe.cfg
+/etc/nagios/nrpe.cfg -->
+
+
+#### configure remote host
+# install nrpe
+
+sudo apt-get update
+sudo apt-get install nagios-nrpe-server
+cd /usr/lib/nagios/plugins/
+ls
+
+# check nrpe is running
+netstat -nl | grep 5666
+
+# restart nrpe server
+sudo /etc/init.d/nagios-nrpe-server restart
+
+
+# configure /etc/nagios/nrpe.cfg
+allowed_hosts=127.0.0.1,fcao1024.com,fcaolabs.com,diy1024.com
+
+# run nrpe via cli
+/usr/lib/nagios/plugins/check_nrpe -H fcaolabs.com -n -c check_load
+
+
+
+
+
+
