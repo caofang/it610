@@ -3,7 +3,7 @@
 # 2017 Fall
 # fang cao
 
-### gitlab installtion 
+### ========== gitlab installtion ==========
 sudo apt-get install -y curl openssh-server ca-certificates
 sudo apt-get install -y postfix
 curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
@@ -21,7 +21,7 @@ nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/diy1024.key"
 
 
 
-### config gitlab
+### ========== config gitlab ==========
 
 /etc/gitlab/gitlab.rb
 
@@ -163,6 +163,19 @@ allowed_hosts=127.0.0.1,fcao1024.com,fcaolabs.com,diy1024.com
 /usr/lib/nagios/plugins/check_nrpe -H fcaolabs.com -n -c check_load
 
 
+### ========== install mysql ==========
+
+sudo apt-get install mysql-server
+root password: njit
+
+# install php
+
+sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
+
+# install phpMyAdmin
+
+sudo apt-get install phpmyadmin php-mbstring php-gettext
+application passwrd: njit
 
 
 
