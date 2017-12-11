@@ -163,19 +163,42 @@ allowed_hosts=127.0.0.1,fcao1024.com,fcaolabs.com,diy1024.com
 /usr/lib/nagios/plugins/check_nrpe -H fcaolabs.com -n -c check_load
 
 
-### ========== install mysql ==========
+### ========== mysql ==========
 
 sudo apt-get install mysql-server
 root password: njit
 
-# install php
+user: it610
+password: njit
 
+# install php
 sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
 
-# install phpMyAdmin
 
+# install phpMyAdmin
 sudo apt-get install phpmyadmin php-mbstring php-gettext
 application passwrd: njit
+
+sudo ln -s /usr/share/phpmyadmin/ /var/www/html/phpmyadmin
+
+# allow remote connection to db
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+
+# the ip of the db local address, so client machine can connect this address
+bind-address		= 172.31.20.48
+
+
+# install mysql client on client machine
+sudo apt-get install mysql-client
+
+
+# connecting to db from client machine
+mysql --host=172.31.20.48 --user=it610 --password=njit
+
+mysql --user="$user" --password="$password" --database="$user" --execute='SELECT * FROM backup';
+mysql --user=it610 --password=njit --database=git --execute='SELECT * FROM backup';
+
 
 
 
