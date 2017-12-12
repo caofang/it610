@@ -196,6 +196,7 @@ sudo apt-get install mysql-client
 # connecting to db from client machine
 mysql --host=172.31.20.48 --user=it610 --password=njit
 
+# connecting to db and send sql query from cli
 mysql --user="$user" --password="$password" --database="$user" --execute='SELECT * FROM backup';
 mysql --user=it610 --password=njit --database=git --execute='SELECT * FROM backup';
 
