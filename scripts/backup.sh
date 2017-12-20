@@ -20,6 +20,5 @@ mysql --user="it610" --host="172.31.20.48" --password="njit" --database="git" --
 olddate=$(date -d 'now - 7 days' +%s)
 echo $olddate
 
-sql_del_entry="DELETE FROM `backup` WHERE id < $olddate"
+sql_del_entry="DELETE FROM backup WHERE id < $olddate"
 mysql --user="it610" --host="172.31.20.48" --password="njit" --database="git" --execute="$sql_del_entry";
-
